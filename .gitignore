@@ -1,9 +1,6 @@
 backend/.env
-<<<<<<< HEAD
 backend/node_modules/
 .env
 db/
-=======
 backend/node_modules
 backend/package-lock.json
->>>>>>> 62b5a75a9b01c126157de22181df2a39ccf95a79
