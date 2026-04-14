@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gun-app-backend
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-5002}:5002"
+    environment:
+      - DB_HOST=${DB_HOST:?DB_HOST is required}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USER=${DB_USER:-gun_app}
+      - DB_PASS=${DB_PASS:?DB_PASS is required}
+      - DB_NAME=${DB_NAME:-gun_app_db}
+      - PORT=5002
