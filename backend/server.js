@@ -13,7 +13,7 @@ const { WebSocketServer } = require('ws');
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 3307,
+  port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER,
   password: process.env.DB_PASS                                                                                                                         ,
   database: process.env.DB_NAME,
@@ -74,7 +74,7 @@ app.get('/api/force-refresh', (req, res) => {
 
 app.post('/api/internal-trigger-refresh', (req, res) => {
     const secret = req.headers['x-trigger-secret'];
-    if (secret !== 'your-very-secret-string') {
+    if (!process.env.TRIGGER_SECRET || secret !== process.env.TRIGGER_SECRET) {
         console.log("Unauthorized attempt to access internal trigger.");
         return res.status(403).send('Forbidden');
     }

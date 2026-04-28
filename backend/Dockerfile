@@ -1,21 +1,12 @@
-# ---- Build Stage ----
-FROM node:20-alpine AS builder
+# ---- Production Image ----
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Copy package files first for better layer caching
 COPY package.json package-lock.json ./
 
-# Install ALL dependencies (including devDependencies if needed for build)
-RUN npm ci
-
-# ---- Production Stage ----
-FROM node:20-alpine
-
-WORKDIR /app
-
 # Install only production dependencies
-COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy application source
@@ -25,7 +16,7 @@ COPY server.js ./
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-# Expose the application port
+# Expose the application port (HTTP + WebSocket on the same port)
 EXPOSE 5002
 
 # Health check — hits the root route

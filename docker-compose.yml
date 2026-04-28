@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: gun-app-backend
     restart: unless-stopped
+    # HTTP + WebSocket both served on the same port
     ports:
       - "${APP_PORT:-5002}:5002"
     environment:
@@ -13,4 +14,5 @@ services:
       - DB_USER=${DB_USER:-gun_app}
       - DB_PASS=${DB_PASS:?DB_PASS is required}
       - DB_NAME=${DB_NAME:-gun_app_db}
+      - TRIGGER_SECRET=${TRIGGER_SECRET:-changeme}
       - PORT=5002
