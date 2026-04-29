@@ -54,8 +54,8 @@ deploy:
   script:
     - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
         docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
-        docker compose -f /opt/gun_app/docker-compose.yml pull &&
-        docker compose -f /opt/gun_app/docker-compose.yml up -d --remove-orphans &&
+        docker compose -f /opt/gun_app_backend/docker-compose.yml pull &&
+        docker compose -f /opt/gun_app_backend/docker-compose.yml up -d --remove-orphans &&
         docker image prune -f
       "
   only:
