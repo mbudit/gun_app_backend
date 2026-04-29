@@ -6,12 +6,10 @@ services:
     ports:
       - "5002:5002"
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT:-3306}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
-      - DB_NAME=${DB_NAME}
-      - TRIGGER_SECRET=${TRIGGER_SECRET:-changeme}
+      - DB_HOST=192.168.50.96
+      - DB_PORT=3306
+      - DB_USER=budi
+      - DB_PASS=shura130601
+      - DB_NAME=linen_tracking
+      - TRIGGER_SECRET=ksdhbvyiewbfiquofqebfkjq
       - PORT=5002
-    env_file:
-      - .env
