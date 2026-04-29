@@ -2,4 +2,3 @@ backend/.env
 backend/node_modules/
 .env
 db/
-backend/node_modules
