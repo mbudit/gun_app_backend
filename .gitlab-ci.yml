@@ -3,6 +3,9 @@ stages:
   - build
   - deploy
 
+variables:
+  APP_DIR: backend
+
 # ─── TEST ───────────────────────────────────────────────
 test:
   stage: test
@@ -10,11 +13,11 @@ test:
   cache:
     key: $CI_COMMIT_REF_SLUG
     paths:
-      - backend/node_modules/
+      - $APP_DIR/node_modules/
   before_script:
-    - cd backend && npm ci
+    - cd $APP_DIR && npm ci
   script:
-    - cd backend && npm test
+    - npm test
   only:
     - main
     - merge_requests
@@ -31,11 +34,8 @@ build:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    # Build and tag with both the commit SHA and latest
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA ./backend
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA -f $APP_DIR/Dockerfile $APP_DIR
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
-
-    # Push both tags
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker push $CI_REGISTRY_IMAGE:latest
   only:
@@ -53,8 +53,8 @@ deploy:
   script:
     - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
         docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
-        docker compose -f /opt/myapp/docker-compose.yml pull &&
-        docker compose -f /opt/myapp/docker-compose.yml up -d --remove-orphans &&
+        docker compose -f /opt/gun_app/docker-compose.yml pull &&
+        docker compose -f /opt/gun_app/docker-compose.yml up -d --remove-orphans &&
         docker image prune -f
       "
   only:
