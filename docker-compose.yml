@@ -1,6 +1,6 @@
 services:
   backend:
-    image: 192.168.50.10:5050/mbudit/gun-app-backend:latest
+    image: http://192.168.50.10:5050/mbudit/gun-app-backend:latest
     container_name: gun_app_backend
     restart: unless-stopped
     ports:
