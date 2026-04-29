@@ -1,26 +1,21 @@
-# ---- Production Image ----
-FROM node:20-alpine
-
+# ---- Build stage ----
+FROM node:20-alpine AS builder
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
 
-# Copy package files first for better layer caching
-COPY package.json package-lock.json ./
-
-# Install only production dependencies
-RUN npm ci --omit=dev && npm cache clean --force
-
-# Copy application source
-COPY server.js ./
+# ---- Runtime stage ----
+FROM node:20-alpine
+WORKDIR /app
 
 # Create a non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+
+RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Expose the application port (HTTP + WebSocket on the same port)
 EXPOSE 5002
-
-# Health check — hits the root route
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:5002/ || exit 1
-
 CMD ["node", "server.js"]

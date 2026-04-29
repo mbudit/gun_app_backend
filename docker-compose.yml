@@ -1,10 +1,10 @@
 services:
   backend:
-    image: 192.168.50.50:5000/gun-app-backend:latest
-    container_name: gun-app-backend
+    image: 192.168.50.10:5050/mbudit/gun-app-backend:latest
+    container_name: gun_app_backend
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-5002}:5002"
+      - "5002:5002"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT:-3306}
