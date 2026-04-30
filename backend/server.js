@@ -406,7 +406,11 @@ app.post('/api/batch-usage', (req, res) => {
 
 
 // --- WS: 6. Start the HTTP server instead of the Express app ---
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket server is listening on the same port.`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`WebSocket server is listening on the same port.`);
+  });
+}
+
+module.exports = { app, server, wss, db };
