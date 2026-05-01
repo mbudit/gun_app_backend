@@ -28,7 +28,7 @@ build:
   image: docker:24
   services:
     - name: docker:24-dind
-      command: ["--insecure-registry=192.168.50.10:5050"]
+      command: ["--insecure-registry=gitlab.lan:5050"]  # can't use vars here
   variables:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
@@ -54,8 +54,8 @@ deploy:
   script:
     - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
         docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
-        docker compose -f /opt/gun_app_backend/docker-compose.yml pull &&
-        docker compose -f /opt/gun_app_backend/docker-compose.yml up -d --remove-orphans &&
+        docker compose -f /opt/$CI_PROJECT_NAME/docker-compose.yml pull &&
+        docker compose -f /opt/$CI_PROJECT_NAME/docker-compose.yml up -d --remove-orphans &&
         docker image prune -f
       "
   only:
