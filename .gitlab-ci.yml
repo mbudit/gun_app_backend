@@ -47,7 +47,7 @@ deploy:
   stage: deploy
   image: alpine
   before_script:
-    - apk add --no-content openssh-client
+    - apk add --no-cache openssh-client
     - eval $(ssh-agent -s)
     - chmod 400 $DEPLOY_KEY
     - ssh-add $DEPLOY_KEY
