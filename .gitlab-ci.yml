@@ -23,22 +23,25 @@ test:
     - merge_requests
 
 # ─── BUILD ──────────────────────────────────────────────
-build:
-  stage: build
-  image: docker:24
-  services:
-    - name: docker:24-dind
-      command: ["--insecure-registry=gitlab.lan:5050"]  # can't use vars here
-  variables:
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_HOST: tcp://docker:2375
+deploy:
+  stage: deploy
+  image: alpine
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - chmod 400 $DEPLOY_KEY
+    - ssh-add $DEPLOY_KEY
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA -f $APP_DIR/Dockerfile $APP_DIR
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
+        mkdir -p /opt/$CI_PROJECT_NAME &&
+        printf 'PORT=%s\nDB_HOST=%s\nDB_PORT=%s\nDB_USER=%s\nDB_PASS=%s\nDB_NAME=%s\nTRIGGER_SECRET=%s\n' \
+          '$PORT' '$DB_HOST' '$DB_PORT' '$DB_USER' '$DB_PASS' '$DB_NAME' '$TRIGGER_SECRET' \
+          > /opt/$CI_PROJECT_NAME/.env &&
+        docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY &&
+        docker compose -f /opt/$CI_PROJECT_NAME/docker-compose.yml pull &&
+        docker compose -f /opt/$CI_PROJECT_NAME/docker-compose.yml up -d --remove-orphans &&
+        docker image prune -f
+      "
   only:
     - main
 
